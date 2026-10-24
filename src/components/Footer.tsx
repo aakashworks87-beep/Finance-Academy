@@ -1,4 +1,5 @@
 import React from 'react';
+import { LOGO_IMG_SRC } from '../assets/logo';
 import { ExternalLink, ShieldCheck, Lock } from 'lucide-react';
 
 interface FooterProps {
@@ -12,7 +13,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
           <div className="flex items-center gap-3.5">
             <img
-              src="/images/academy_logo.jpg"
+              src={LOGO_IMG_SRC}
               alt="Finance Academy Logo"
               referrerPolicy="no-referrer"
               className="w-11 h-11 rounded-xl object-cover border border-[#d4af37]/40 shadow-sm shrink-0"

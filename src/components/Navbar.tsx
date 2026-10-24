@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LOGO_IMG_SRC } from '../assets/logo';
 import { BookOpen, Sparkles, Menu, X, Calculator, ShieldCheck, Landmark, Library } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,7 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAiChat, activeSection }) =
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-3 group">
             <img
-              src="/images/academy_logo.jpg"
+              src={LOGO_IMG_SRC}
               alt="Finance Academy by Aakash Logo"
               referrerPolicy="no-referrer"
               className="w-10 h-10 rounded-xl object-cover border border-[#d4af37]/40 shadow-sm group-hover:border-[#d4af37] transition-all"

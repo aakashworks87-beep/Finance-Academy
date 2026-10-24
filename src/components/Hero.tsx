@@ -1,4 +1,5 @@
 import React from 'react';
+import { LOGO_IMG_SRC } from '../assets/logo';
 import { ArrowDown, BookOpenCheck, ShieldAlert, Sparkles, TrendingUp, Layers, HelpCircle } from 'lucide-react';
 
 interface HeroProps {
@@ -20,7 +21,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartLearning, onOpenCalculator, o
           <div className="relative group">
             <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#d4af37]/40 via-amber-400/20 to-[#d4af37]/40 blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
             <img
-              src="/images/academy_logo.jpg"
+              src={LOGO_IMG_SRC}
               alt="Finance Academy by Aakash Emblem"
               referrerPolicy="no-referrer"
               className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-[#d4af37]/60 shadow-2xl shadow-[#d4af37]/20"

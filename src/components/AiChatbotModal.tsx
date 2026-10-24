@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { LOGO_IMG_SRC } from '../assets/logo';
 import { ChatMessage } from '../types';
 import { FormattedMessage } from './FormattedMessage';
 import { Sparkles, Send, X, Bot, User, BrainCircuit, Zap, BookOpen, Trash2, AlertTriangle } from 'lucide-react';
@@ -128,7 +129,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
         <div className="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/70 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/images/academy_logo.jpg"
+              src={LOGO_IMG_SRC}
               alt="Finance Academy Logo"
               referrerPolicy="no-referrer"
               className="w-9 h-9 rounded-xl object-cover border border-[#d4af37]/40 shadow-md shrink-0"
@@ -232,7 +233,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
                   </div>
                 ) : (
                   <img
-                    src="/images/academy_logo.jpg"
+                    src={LOGO_IMG_SRC}
                     alt="AI Tutor"
                     referrerPolicy="no-referrer"
                     className="w-8 h-8 rounded-xl object-cover border border-[#d4af37]/40 shadow-sm shrink-0"
