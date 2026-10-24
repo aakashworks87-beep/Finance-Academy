@@ -28,7 +28,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
   // Check backend health for genuine online/offline status
   const checkHealth = async () => {
     try {
-      const res = await fetch('/api/health');
+      const res = await fetch('https://ais-pre-go3g32rkwrmxlyvwgidedn-813067729840.asia-southeast1.run.app/api/health');
       if (res.ok) {
         const data = await res.json();
         setIsOnline(Boolean(data.online));
@@ -64,7 +64,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
     setLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('https://ais-pre-go3g32rkwrmxlyvwgidedn-813067729840.asia-southeast1.run.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

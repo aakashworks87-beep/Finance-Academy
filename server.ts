@@ -29,6 +29,17 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
+// Enable CORS for cross-origin frontend hosting (e.g. GitHub Pages)
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (_req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // Initialize server-side Gemini client with required User-Agent
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
