@@ -1,0 +1,6 @@
+{
+  "name": "Finance Academy by Aakash",
+  "description": "A free learning hub that takes a beginner from zero to confident about mutual funds, RBI, SEBI, and investing in India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
