@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { MutualFundsCourse } from './components/MutualFundsCourse';
+import { CertificateSection } from './components/CertificateSection';
+import { FinalExamModal } from './components/FinalExamModal';
+import { RoastModal } from './components/RoastModal';
 import { BeyondMutualFunds } from './components/BeyondMutualFunds';
 import { RegulatorsGuide } from './components/RegulatorsGuide';
 import { SipCalculator } from './components/SipCalculator';
@@ -12,16 +15,87 @@ import { AiChatbotModal } from './components/AiChatbotModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { Footer } from './components/Footer';
 import { Sparkles } from 'lucide-react';
+import {
+  CourseProgress,
+  loadCourseProgress,
+  saveCourseProgress,
+  getNextRequiredLevel,
+  getRandomRoast,
+  isCertificateUnlocked,
+  isFinalExamUnlocked,
+} from './utils/courseProgress';
 
 export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isExamModalOpen, setIsExamModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('course');
+
+  // Course progression state
+  const [progress, setProgress] = useState<CourseProgress>(() => loadCourseProgress());
+  const [activeLevelId, setActiveLevelId] = useState(() => getNextRequiredLevel(progress.passedLevels));
+
+  // Roast modal state
+  const [roastState, setRoastState] = useState<{
+    isOpen: boolean;
+    message: string;
+    attemptedItemName: string;
+  }>({
+    isOpen: false,
+    message: '',
+    attemptedItemName: '',
+  });
+
+  // Keep progress synchronized with localStorage
+  const handleUpdateProgress = (newProgress: CourseProgress) => {
+    setProgress(newProgress);
+    saveCourseProgress(newProgress);
+  };
+
+  const handleAttemptLockedItem = (itemName: string) => {
+    setRoastState({
+      isOpen: true,
+      message: getRandomRoast(),
+      attemptedItemName: itemName,
+    });
+  };
+
+  const handleRoastDismiss = () => {
+    const nextRequired = getNextRequiredLevel(progress.passedLevels);
+    setActiveLevelId(nextRequired);
+    setRoastState((prev) => ({ ...prev, isOpen: false }));
+    scrollTo('course');
+  };
+
+  const handleOpenCertificate = () => {
+    if (!isCertificateUnlocked(progress.finalExamPassed)) {
+      handleAttemptLockedItem('Certificate of Completion');
+      return;
+    }
+    scrollTo('certificate');
+  };
+
+  const handleOpenExam = () => {
+    if (!isFinalExamUnlocked(progress.passedLevels)) {
+      handleAttemptLockedItem('Final Exam');
+      return;
+    }
+    setIsExamModalOpen(true);
+  };
 
   // Track active section for top nav
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['course', 'beyond', 'regulators', 'calculator', 'glossary', 'regulatory-topics', 'analysis'];
+      const sections = [
+        'course',
+        'certificate',
+        'beyond',
+        'regulators',
+        'calculator',
+        'glossary',
+        'regulatory-topics',
+        'analysis',
+      ];
       const scrollPos = window.scrollY + 200;
 
       for (const section of sections) {
@@ -54,6 +128,8 @@ export default function App() {
       <Navbar
         onOpenAiChat={() => setIsAiModalOpen(true)}
         activeSection={activeSection}
+        onCertificateClick={handleOpenCertificate}
+        isCertificateUnlocked={isCertificateUnlocked(progress.finalExamPassed)}
       />
 
       {/* Main Content Sections */}
@@ -66,24 +142,39 @@ export default function App() {
         />
 
         {/* 2. Learn Mutual Funds (Levels 1 to 7) */}
-        <MutualFundsCourse />
+        <MutualFundsCourse
+          progress={progress}
+          onUpdateProgress={handleUpdateProgress}
+          onOpenExam={handleOpenExam}
+          onOpenCertificate={handleOpenCertificate}
+          onAttemptLockedItem={handleAttemptLockedItem}
+          activeLevelId={activeLevelId}
+          setActiveLevelId={setActiveLevelId}
+        />
 
-        {/* 3. Investing Beyond MFs */}
+        {/* 3. Official Certificate Section */}
+        <CertificateSection
+          progress={progress}
+          onUpdateProgress={handleUpdateProgress}
+          onOpenExam={handleOpenExam}
+        />
+
+        {/* 4. Investing Beyond MFs */}
         <BeyondMutualFunds />
 
-        {/* 4 & 5. Understand RBI and SEBI */}
+        {/* 5. Understand RBI and SEBI */}
         <RegulatorsGuide />
 
-        {/* 9. Tools: Working SIP Calculator */}
+        {/* 6. Tools: Working SIP Calculator */}
         <SipCalculator />
 
-        {/* 6. Glossary (A to Z) */}
+        {/* 7. Glossary (A to Z) */}
         <Glossary />
 
-        {/* 7. Key regulatory topics, curated from official sources */}
+        {/* 8. Key regulatory topics, curated from official sources */}
         <LiveUpdates />
 
-        {/* 8. My Analysis (Blog) */}
+        {/* 9. My Analysis (Blog) */}
         <MyAnalysis />
       </main>
 
@@ -104,6 +195,24 @@ export default function App() {
           <span className="tracking-wide">Ask Aakash AI Tutor</span>
         </button>
       </div>
+
+      {/* Final Exam Modal */}
+      <FinalExamModal
+        isOpen={isExamModalOpen}
+        progress={progress}
+        onClose={() => setIsExamModalOpen(false)}
+        onUpdateProgress={handleUpdateProgress}
+        onGoToCertificate={() => scrollTo('certificate')}
+      />
+
+      {/* Skip Attempt Roast Modal */}
+      <RoastModal
+        isOpen={roastState.isOpen}
+        message={roastState.message}
+        nextRequiredLevel={getNextRequiredLevel(progress.passedLevels)}
+        attemptedItemName={roastState.attemptedItemName}
+        onDismiss={handleRoastDismiss}
+      />
 
       {/* Gemini AI Multi-turn Chatbot Modal */}
       <AiChatbotModal

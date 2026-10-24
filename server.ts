@@ -1,5 +1,5 @@
 import express from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -29,15 +29,46 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
-// Enable CORS for cross-origin frontend hosting (e.g. GitHub Pages)
-app.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+// Enable CORS for cross-origin requests from GitHub Pages and preview environments
+const ALLOWED_ORIGIN = 'https://aakashworks87-beep.github.io';
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const origin = req.headers.origin;
+  if (origin && (origin === ALLOWED_ORIGIN || origin.endsWith('.github.io') || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('run.app'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (_req.method === 'OPTIONS') {
+
+  // Handle OPTIONS preflight requests
+  if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
   }
   next();
+});
+
+// Explicit OPTIONS preflight route handlers for required API routes
+app.options('/api/health', (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || ALLOWED_ORIGIN);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return res.sendStatus(204);
+});
+
+app.options('/api/chat', (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || ALLOWED_ORIGIN);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return res.sendStatus(204);
+});
+
+app.options('/api/regulatory-topics', (req: Request, res: Response) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || ALLOWED_ORIGIN);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return res.sendStatus(204);
 });
 
 // Initialize server-side Gemini client with required User-Agent

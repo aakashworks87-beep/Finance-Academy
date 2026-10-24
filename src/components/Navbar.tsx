@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { LOGO_IMG_SRC } from '../assets/logo';
-import { BookOpen, Sparkles, Menu, X, Calculator, ShieldCheck, Landmark, Library } from 'lucide-react';
+import { BookOpen, Sparkles, Menu, X, Calculator, ShieldCheck, Landmark, Library, Award, Lock } from 'lucide-react';
 
 interface NavbarProps {
   onOpenAiChat: () => void;
   activeSection: string;
+  onCertificateClick: () => void;
+  isCertificateUnlocked: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenAiChat, activeSection }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  onOpenAiChat,
+  activeSection,
+  onCertificateClick,
+  isCertificateUnlocked,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -58,8 +65,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAiChat, activeSection }) =
             ))}
           </div>
 
-          {/* Action: Ask AI Mentor */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Action: Certificate & Ask AI Mentor */}
+          <div className="hidden sm:flex items-center gap-2.5">
+            <button
+              onClick={onCertificateClick}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                isCertificateUnlocked
+                  ? 'bg-amber-500/15 border-amber-500/50 text-[#fae596] hover:bg-amber-500/25'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+              }`}
+            >
+              {isCertificateUnlocked ? (
+                <Award className="w-3.5 h-3.5 text-[#d4af37]" />
+              ) : (
+                <Lock className="w-3.5 h-3.5 text-slate-500" />
+              )}
+              <span>Certificate</span>
+            </button>
+
             <button
               onClick={onOpenAiChat}
               className="relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-900 bg-gradient-to-r from-[#d4af37] via-amber-300 to-[#d4af37] hover:shadow-lg hover:shadow-[#d4af37]/20 transition-all active:scale-95"
@@ -102,7 +125,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAiChat, activeSection }) =
               {item.label}
             </a>
           ))}
-          <div className="pt-2">
+          <div className="pt-2 space-y-2">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onCertificateClick();
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-700 bg-slate-900 text-slate-200"
+            >
+              {isCertificateUnlocked ? (
+                <Award className="w-4 h-4 text-[#d4af37]" />
+              ) : (
+                <Lock className="w-4 h-4 text-slate-500" />
+              )}
+              <span>{isCertificateUnlocked ? 'Claim Certificate' : 'Certificate (Locked)'}</span>
+            </button>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
