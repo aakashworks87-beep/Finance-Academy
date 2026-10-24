@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LOGO_IMG_SRC } from '../assets/logo';
+import { API_ENDPOINTS } from '../config/api';
 import { ChatMessage } from '../types';
 import { FormattedMessage } from './FormattedMessage';
 import { Sparkles, Send, X, Bot, User, BrainCircuit, Zap, BookOpen, Trash2, AlertTriangle } from 'lucide-react';
@@ -29,7 +30,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
   // Check backend health for genuine online/offline status
   const checkHealth = async () => {
     try {
-      const res = await fetch('https://ais-pre-go3g32rkwrmxlyvwgidedn-813067729840.asia-southeast1.run.app/api/health');
+      const res = await fetch(API_ENDPOINTS.health);
       if (res.ok) {
         const data = await res.json();
         setIsOnline(Boolean(data.online));
@@ -65,7 +66,7 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({ isOpen, onClose 
     setLoading(true);
 
     try {
-      const response = await fetch('https://ais-pre-go3g32rkwrmxlyvwgidedn-813067729840.asia-southeast1.run.app/api/chat', {
+      const response = await fetch(API_ENDPOINTS.chat, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
