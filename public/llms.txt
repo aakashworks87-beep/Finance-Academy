@@ -1,0 +1,32 @@
+# Finance Academy by Aakash
+
+> A free learning hub that takes a beginner from zero to confident about mutual funds, RBI, SEBI, and investing in India. Education only, not investment advice.
+
+Built by Aakash Hegde, a B.Voc BFSI student at TISS Mumbai.
+
+## What it teaches
+
+- Mutual funds: 7 levels from basics to advanced, with quizzes after each level
+- How NAV, SIP, expense ratio, and fund types work
+- RBI and SEBI: what they do and why they matter to investors
+- Asset classes: equity, debt, gold, and more
+- 80-term finance glossary in simple words
+- SIP calculator to plan monthly investing
+- Blog with finance explainers and analysis
+- AI tutor that answers finance questions
+- Certificate after passing the final exam
+
+## Who it is for
+
+- Beginners in India who want to understand mutual funds and investing
+- Students learning banking and financial services (BFSI)
+- Anyone who wants free, simple finance education with no sign-in and no fees
+
+## Important notes
+
+- Education only. The site never recommends specific funds or shares to buy or sell.
+- Free forever. No login needed to learn, no fees.
+
+## Links
+
+- Home: https://aakashworks87-beep.github.io/Finance-Academy/
