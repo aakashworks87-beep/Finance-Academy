@@ -227,36 +227,36 @@ export const CertificateSection: React.FC<CertificateSectionProps> = ({
 
   if (!isUnlocked) {
     return (
-      <section id="certificate" className="py-16 md:py-24 border-t border-slate-800/80 bg-[#060a14]">
+      <section id="certificate" className="py-16 md:py-24 border-t border-white/10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-slate-400 uppercase tracking-wider mb-4">
             <Lock className="w-3.5 h-3.5" />
             <span>Locked Credential</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
             Official Certificate of Completion
           </h2>
 
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-slate-400 font-serif text-sm sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
             Every certificate from Finance Academy is strictly earned. Pass all 7 module quizzes with at least 2 out of 3 correct, then pass the comprehensive Final Exam to unlock your verified credential.
           </p>
 
           {/* Locked Preview Card */}
-          <div className="relative max-w-2xl mx-auto rounded-3xl border-2 border-dashed border-slate-800 bg-slate-950/60 p-8 sm:p-12 text-center overflow-hidden">
-            <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-500">
-              <Award className="w-8 h-8" />
+          <div className="relative max-w-2xl mx-auto rounded-3xl border border-dashed border-white/15 bg-[#0d0e14] p-8 sm:p-12 text-center overflow-hidden">
+            <div className="w-16 h-16 rounded-2xl bg-black border border-white/10 flex items-center justify-center mx-auto mb-4 text-slate-500">
+              <Award className="w-8 h-8 text-[#d4af37]" />
             </div>
 
-            <h3 className="text-xl font-bold text-slate-300 mb-2">
+            <h3 className="text-xl font-serif font-bold text-slate-300 mb-2">
               Certificate of Completion
             </h3>
 
-            <p className="text-xs text-slate-500 mb-6 max-w-md mx-auto">
+            <p className="text-xs font-serif text-slate-400 mb-6 max-w-md mx-auto">
               Your personalized certificate featuring a unique verification ID, custom student name, and date of completion will unlock here.
             </p>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-sans font-semibold">
               <Sparkles className="w-4 h-4 text-[#d4af37]" />
               <span>Current Status: {progress.passedLevels.length} of 7 Levels Passed</span>
             </div>
@@ -265,7 +265,7 @@ export const CertificateSection: React.FC<CertificateSectionProps> = ({
               <div className="mt-8">
                 <button
                   onClick={onOpenExam}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] via-amber-300 to-[#d4af37] text-slate-950 font-bold text-sm shadow-xl shadow-[#d4af37]/25 hover:shadow-2xl hover:shadow-[#d4af37]/40 hover:scale-105 transition-all"
+                  className="px-6 py-3 rounded-xl bg-[#d4af37] text-slate-950 font-sans font-bold text-sm shadow-xl hover:brightness-110 hover:scale-105 transition-all"
                 >
                   All 7 Levels Passed: Take Final Exam Now
                 </button>
@@ -278,7 +278,7 @@ export const CertificateSection: React.FC<CertificateSectionProps> = ({
   }
 
   return (
-    <section id="certificate" className="py-16 md:py-24 border-t border-slate-800/80 bg-[#060a14]">
+    <section id="certificate" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">

@@ -7,17 +7,17 @@ export const MyAnalysis: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   return (
-    <section id="analysis" className="py-16 md:py-24 border-t border-slate-800/80">
+    <section id="analysis" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-xs font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
-            Author Perspective
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
+            <span>Author Perspective</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
             My Analysis: Stories from Indian Markets
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed">
+          <p className="text-slate-300 font-serif text-base leading-relaxed">
             Conversational deep-dives translating regulatory shifts and fund mechanics into practical personal knowledge. Written in plain words to help you navigate your wealth journey with calm confidence.
           </p>
         </div>
@@ -28,11 +28,11 @@ export const MyAnalysis: React.FC = () => {
             <div
               key={post.id}
               onClick={() => setSelectedPost(post)}
-              className="group cursor-pointer p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-[#d4af37]/60 hover:bg-slate-900/80 transition-all flex flex-col justify-between shadow-lg"
+              className="group cursor-pointer p-6 rounded-2xl bg-[#0d0e14] border border-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-all flex flex-col justify-between shadow-lg"
             >
               <div>
                 {/* Meta details */}
-                <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center justify-between gap-2 mb-3 font-sans">
                   <span className="text-xs font-semibold text-[#d4af37] uppercase tracking-wider">
                     {post.category}
                   </span>
@@ -42,16 +42,16 @@ export const MyAnalysis: React.FC = () => {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-white group-hover:text-[#fae596] transition-colors mb-3 leading-snug">
+                <h3 className="text-lg font-serif font-bold text-white group-hover:text-[#fae596] transition-colors mb-3 leading-snug">
                   {post.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 line-clamp-3">
+                <p className="text-xs sm:text-sm font-serif text-slate-300 leading-relaxed mb-6 line-clamp-3">
                   {post.summary}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between font-sans">
                 <div className="flex items-center gap-1.5 text-xs text-slate-400">
                   <UserCheck className="w-3.5 h-3.5 text-[#d4af37]" />
                   <span>By Aakash</span>
@@ -73,21 +73,21 @@ export const MyAnalysis: React.FC = () => {
 
         {/* Full Story Reader Modal */}
         {selectedPost && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-            <div className="w-full max-w-3xl bg-[#090e1a] border border-[#d4af37]/40 rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+            <div className="w-full max-w-3xl bg-[#09090b] border border-white/10 rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
               {/* Modal Top Bar */}
-              <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
-                <div className="flex items-center gap-3 text-xs">
+              <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-[#0c0d12]">
+                <div className="flex items-center gap-3 text-xs font-sans">
                   <span className="px-2.5 py-1 rounded-lg bg-[#d4af37]/15 text-[#fae596] font-semibold border border-[#d4af37]/30">
                     {selectedPost.category}
                   </span>
                   <span className="text-slate-400">{selectedPost.date}</span>
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-500">&bull;</span>
                   <span className="text-slate-400">{selectedPost.readTime}</span>
                 </div>
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -95,30 +95,30 @@ export const MyAnalysis: React.FC = () => {
 
               {/* Modal Body */}
               <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-slate-200">
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                <h3 className="text-2xl sm:text-3xl font-serif font-black text-white leading-tight">
                   {selectedPost.title}
                 </h3>
 
-                <div className="flex items-center gap-2 text-xs text-slate-400 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2 text-xs font-sans text-slate-400 pb-4 border-b border-white/10">
                   <span className="font-semibold text-slate-200">Written by Aakash Hegde</span>
-                  <span>•</span>
+                  <span>&bull;</span>
                   <span>Finance Academy Analysis</span>
                 </div>
 
                 {/* Full Article Text */}
-                <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                <div className="space-y-4 text-sm sm:text-base font-serif text-slate-300 leading-relaxed font-normal">
                   {selectedPost.storyContent.map((paragraph, i) => (
                     <p key={i}>{paragraph}</p>
                   ))}
                 </div>
 
                 {/* Key Insights Box */}
-                <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 mt-6">
-                  <h4 className="text-xs font-bold text-[#fae596] uppercase tracking-wider flex items-center gap-2">
+                <div className="p-6 rounded-2xl bg-[#0d0e14] border border-white/10 space-y-3 mt-6">
+                  <h4 className="text-xs font-sans font-bold text-[#fae596] uppercase tracking-wider flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-[#d4af37]" />
                     <span>Key Takeaways for Investors</span>
                   </h4>
-                  <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300">
+                  <ul className="space-y-2.5 text-xs sm:text-sm font-serif text-slate-300">
                     {selectedPost.takeaways.map((point, idx) => (
                       <li key={idx} className="flex items-start gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-[#d4af37] shrink-0 mt-0.5" />
@@ -130,13 +130,13 @@ export const MyAnalysis: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between">
+              <div className="p-4 border-t border-white/10 bg-[#0c0d12] flex items-center justify-between font-sans">
                 <span className="text-xs text-slate-400">
                   Educational commentary for Indian retail investors.
                 </span>
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition-all"
+                  className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-all"
                 >
                   Close Article
                 </button>

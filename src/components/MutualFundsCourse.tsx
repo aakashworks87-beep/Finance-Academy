@@ -270,9 +270,9 @@ export const MutualFundsCourse: React.FC<MutualFundsCourseProps> = ({
         </div>
 
         {/* Active Level Content Container */}
-        <div className="bg-slate-900/50 rounded-3xl border border-slate-800/90 p-6 sm:p-8 md:p-10 backdrop-blur-sm shadow-xl">
+        <div className="bg-[#0d0e14] rounded-3xl border border-white/10 p-6 sm:p-8 md:p-10 shadow-xl">
           {/* Level Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8 font-sans">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-bold text-[#d4af37] uppercase tracking-wider">
@@ -285,12 +285,12 @@ export const MutualFundsCourse: React.FC<MutualFundsCourseProps> = ({
                   </span>
                 )}
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-serif font-black text-white tracking-tight">
                 {activeLevel.title}
               </h3>
-              <p className="text-slate-400 text-sm mt-1">{activeLevel.tagline}</p>
+              <p className="text-slate-400 font-serif text-sm mt-1">{activeLevel.tagline}</p>
             </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs font-medium text-slate-300">
+            <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-lg bg-black border border-white/10 text-xs font-sans font-medium text-slate-300">
               <span>{activeLevel.readTime}</span>
             </div>
           </div>

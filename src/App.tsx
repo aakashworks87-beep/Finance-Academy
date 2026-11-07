@@ -14,6 +14,7 @@ import { MyAnalysis } from './components/MyAnalysis';
 import { AiChatbotModal } from './components/AiChatbotModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { Footer } from './components/Footer';
+import { SparkleStarsBackground } from './components/SparkleStarsBackground';
 import { Sparkles } from 'lucide-react';
 import {
   CourseProgress,
@@ -123,7 +124,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080d1a] text-slate-100 flex flex-col font-sans selection:bg-[#d4af37]/30 selection:text-[#fae596]">
+    <div className="min-h-screen bg-black text-[#e2e8f0] flex flex-col font-serif selection:bg-[#d4af37]/30 selection:text-[#fae596] relative">
+      {/* Calm Starfield Background: Pure black with fine silver sparkle dust that twinkles on hover */}
+      <SparkleStarsBackground />
+
       {/* Top Navigation */}
       <Navbar
         onOpenAiChat={() => setIsAiModalOpen(true)}
@@ -133,7 +137,7 @@ export default function App() {
       />
 
       {/* Main Content Sections */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {/* 1. Hero Section */}
         <Hero
           onStartLearning={() => scrollTo('course')}
@@ -185,8 +189,8 @@ export default function App() {
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setIsAiModalOpen(true)}
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#d4af37] via-amber-300 to-[#d4af37] text-slate-950 font-bold text-xs sm:text-sm shadow-xl shadow-[#d4af37]/25 hover:shadow-2xl hover:shadow-[#d4af37]/40 hover:scale-105 active:scale-95 transition-all"
-          aria-label="Open AI Mentor"
+          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[#d4af37] text-slate-950 font-sans font-bold text-xs sm:text-sm shadow-xl shadow-black/80 hover:brightness-110 hover:scale-105 active:scale-95 transition-all border border-amber-300/40"
+          aria-label="Open AI Tutor"
         >
           <div className="relative">
             <Sparkles className="w-4 h-4 text-slate-950 group-hover:rotate-12 transition-transform" />
@@ -218,6 +222,9 @@ export default function App() {
       <AiChatbotModal
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
+        onNavigateSection={(sectionId) => scrollTo(sectionId)}
+        onOpenExam={handleOpenExam}
+        onOpenCertificate={handleOpenCertificate}
       />
 
       {/* Honest Privacy Note Modal */}

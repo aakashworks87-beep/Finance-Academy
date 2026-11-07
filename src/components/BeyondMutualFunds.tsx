@@ -1,20 +1,20 @@
 import React from 'react';
 import { BEYOND_ASSETS } from '../data/investingBeyondData';
-import { Landmark, TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export const BeyondMutualFunds: React.FC = () => {
   return (
-    <section id="beyond" className="py-16 md:py-24 border-t border-slate-800/80">
+    <section id="beyond" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-xs font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
-            Asset Classes
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
+            <span>Asset Classes</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
             Investing Beyond Mutual Funds
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed">
+          <p className="text-slate-300 font-serif text-base leading-relaxed">
             Mutual funds are the foundation, but a comprehensive financial plan often incorporates other vital asset classes. Here is how each compares in risk, suitability, and liquidity.
           </p>
         </div>
@@ -31,11 +31,11 @@ export const BeyondMutualFunds: React.FC = () => {
             return (
               <div
                 key={asset.id}
-                className="group relative p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-[#d4af37]/50 hover:bg-slate-900/80 transition-all flex flex-col justify-between shadow-lg"
+                className="group relative p-6 rounded-2xl bg-[#0d0e14] border border-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-all flex flex-col justify-between shadow-lg"
               >
                 <div>
                   {/* Category & Risk Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
+                  <div className="flex items-center justify-between gap-2 mb-4 font-sans">
                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
                       {asset.category}
                     </span>
@@ -50,17 +50,17 @@ export const BeyondMutualFunds: React.FC = () => {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-white group-hover:text-[#fae596] transition-colors mb-3">
+                  <h3 className="text-xl font-serif font-bold text-white group-hover:text-[#fae596] transition-colors mb-3">
                     {asset.title}
                   </h3>
 
                   {/* Two-line description as required */}
-                  <p className="text-slate-300 text-sm leading-relaxed mb-4 min-h-[44px]">
+                  <p className="text-slate-300 font-serif text-sm leading-relaxed mb-4 min-h-[44px]">
                     {asset.summary}
                   </p>
 
                   {/* Who it suits */}
-                  <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 mb-4">
+                  <div className="p-3.5 rounded-xl bg-black/60 border border-white/10 mb-4 font-sans">
                     <span className="text-[11px] font-bold text-[#d4af37] uppercase tracking-wider block mb-1">
                       Who It Suits
                     </span>
@@ -69,7 +69,7 @@ export const BeyondMutualFunds: React.FC = () => {
                 </div>
 
                 {/* Return, Liquidity, and Key Takeaway Footer */}
-                <div className="pt-4 border-t border-slate-800/80 space-y-2 text-xs">
+                <div className="pt-4 border-t border-white/10 space-y-2 text-xs font-sans">
                   <div className="flex items-center justify-between text-slate-400">
                     <span>Expected Return:</span>
                     <span className="font-semibold text-slate-200">{asset.expectedReturn}</span>
@@ -78,7 +78,7 @@ export const BeyondMutualFunds: React.FC = () => {
                     <span>Liquidity:</span>
                     <span className="font-semibold text-slate-200">{asset.liquidity}</span>
                   </div>
-                  <p className="text-[11px] text-amber-200/80 bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 mt-2">
+                  <p className="text-[11px] text-amber-200/90 bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20 mt-2">
                     <strong>Rule:</strong> {asset.keyRule}
                   </p>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { GLOSSARY_TERMS } from '../data/glossaryData';
-import { Search, Library, Tag } from 'lucide-react';
+import { Search, Library } from 'lucide-react';
 
 export const Glossary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,23 +27,23 @@ export const Glossary: React.FC = () => {
   }, [searchTerm, selectedLetter, selectedCategory]);
 
   return (
-    <section id="glossary" className="py-16 md:py-24 border-t border-slate-800/80">
+    <section id="glossary" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-xs font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
-            A to Z Encyclopedia
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
+            <span>A to Z Encyclopedia</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
             Financial Terms Glossary
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed">
+          <p className="text-slate-300 font-serif text-base leading-relaxed">
             Over 75 essential financial concepts defined in exactly one simple, jargon-free sentence each. Search by keyword or filter alphabetically.
           </p>
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="space-y-4 mb-10 max-w-4xl mx-auto">
+        <div className="space-y-4 mb-10 max-w-4xl mx-auto font-sans">
           {/* Search box */}
           <div className="relative">
             <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -52,7 +52,7 @@ export const Glossary: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search terms (e.g. NAV, Expense Ratio, Repo Rate, Compounding)..."
-              className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] text-sm transition-all shadow-inner"
+              className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[#0d0e14] border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37] text-sm transition-all shadow-inner"
             />
             {searchTerm && (
               <button
@@ -73,7 +73,7 @@ export const Glossary: React.FC = () => {
                 className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                   selectedCategory === cat
                     ? 'bg-[#d4af37] text-slate-950 font-bold'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                    : 'bg-[#0d0e14] text-slate-400 hover:text-white border border-white/10'
                 }`}
               >
                 {cat}
@@ -89,7 +89,7 @@ export const Glossary: React.FC = () => {
                 onClick={() => setSelectedLetter(letter)}
                 className={`px-2 py-1 rounded text-xs font-semibold transition-all ${
                   selectedLetter === letter
-                    ? 'bg-[#d4af37] text-slate-950 font-bold scale-110'
+                    ? 'bg-[#d4af37] text-slate-950 font-bold scale-105'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -123,18 +123,18 @@ export const Glossary: React.FC = () => {
           {filteredTerms.map((item) => (
             <div
               key={item.term}
-              className="p-5 rounded-xl bg-slate-900/40 border border-slate-800/80 hover:border-[#d4af37]/40 hover:bg-slate-900/70 transition-all flex flex-col justify-between"
+              className="p-5 rounded-xl bg-[#0d0e14] border border-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <h4 className="text-base font-bold text-white tracking-tight">
+                <div className="flex items-center justify-between gap-2 mb-2 font-sans">
+                  <h4 className="text-base font-serif font-bold text-white tracking-tight">
                     {item.term}
                   </h4>
                   <span className="text-[10px] uppercase font-semibold text-amber-300/80 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
                     {item.category}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm font-serif text-slate-300 leading-relaxed">
                   {item.definition}
                 </p>
               </div>
@@ -142,7 +142,7 @@ export const Glossary: React.FC = () => {
           ))}
 
           {filteredTerms.length === 0 && (
-            <div className="col-span-full text-center py-12 text-slate-400">
+            <div className="col-span-full text-center py-12 text-slate-400 font-sans">
               <Library className="w-10 h-10 text-slate-600 mx-auto mb-3" />
               <p className="text-sm">No terms matched your search filter.</p>
               <button
@@ -151,7 +151,7 @@ export const Glossary: React.FC = () => {
                   setSelectedLetter('ALL');
                   setSelectedCategory('ALL');
                 }}
-                className="mt-3 px-4 py-2 rounded-lg bg-slate-800 text-xs text-white hover:bg-slate-700"
+                className="mt-3 px-4 py-2 rounded-lg bg-white/10 text-xs text-white hover:bg-white/20"
               >
                 Show all terms
               </button>

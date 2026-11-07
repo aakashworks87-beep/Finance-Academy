@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Landmark, ShieldCheck, FileText } from 'lucide-react';
+import { ExternalLink, Landmark, ShieldCheck, FileText, AlertCircle } from 'lucide-react';
 import { API_ENDPOINTS } from '../config/api';
+
+interface FeedItem {
+  title: string;
+  date: string;
+  link: string;
+  label?: string;
+}
 
 interface RegulatoryTopic {
   id: string;
@@ -12,171 +19,58 @@ interface RegulatoryTopic {
   url: string;
 }
 
-interface FeedItem {
-  title: string;
-  date: string;
-  link: string;
-}
-
-// Feed titles can contain HTML entities (for example &#8377; for the rupee
-// sign). Decode them so titles display as real text.
-const decodeEntities = (text: string): string => {
-  const ta = document.createElement('textarea');
-  ta.innerHTML = text;
-  return ta.value;
-};
-
-// The feeds endpoints return items with a title, a date and a link. Accept the
-// common payload shapes and field spellings, and keep only usable items.
-const normalizeFeedItems = (payload: unknown): FeedItem[] => {
-  const root = (payload ?? {}) as Record<string, unknown>;
-  const rawList: unknown[] = Array.isArray(payload)
-    ? payload
-    : Array.isArray(root.items)
-      ? (root.items as unknown[])
-      : Array.isArray(root.feed)
-        ? (root.feed as unknown[])
-        : Array.isArray(root.results)
-          ? (root.results as unknown[])
-          : Array.isArray(root.data)
-            ? (root.data as unknown[])
-            : [];
-
-  const items: FeedItem[] = [];
-  for (const raw of rawList) {
-    if (!raw || typeof raw !== 'object') continue;
-    const r = raw as Record<string, unknown>;
-    const title =
-      typeof r.title === 'string' ? r.title : typeof r.name === 'string' ? r.name : '';
-    const link =
-      typeof r.link === 'string'
-        ? r.link
-        : typeof r.url === 'string'
-          ? r.url
-          : typeof r.href === 'string'
-            ? r.href
-            : '';
-    const date =
-      typeof r.date === 'string'
-        ? r.date
-        : typeof r.pubDate === 'string'
-          ? r.pubDate
-          : typeof r.published === 'string'
-            ? r.published
-            : '';
-    if (!title || !link) continue;
-    items.push({ title: decodeEntities(title), date, link });
-  }
-  return items.slice(0, 8);
-};
-
-const formatFeedDate = (value: string): string => {
-  if (!value) return '';
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-};
-
-const LiveFeedList: React.FC<{
-  title: string;
-  endpoint: string;
-  icon: React.ReactNode;
-}> = ({ title, endpoint, icon }) => {
-  const [items, setItems] = useState<FeedItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) throw new Error(`Feed request failed: ${res.status}`);
-        const payload: unknown = await res.json();
-        const parsed = normalizeFeedItems(payload);
-        if (parsed.length === 0) throw new Error('Feed returned no items');
-        if (cancelled) return;
-        setItems(parsed);
-        setUpdatedAt(new Date());
-        setStatus('ok');
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [endpoint]);
-
-  return (
-    <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 shadow-lg text-left flex flex-col">
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <h3 className="flex items-center gap-2 text-base font-bold text-white">
-          {icon}
-          <span>{title}</span>
-        </h3>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-emerald-950/60 text-emerald-300 border border-emerald-700/60">
-          <span className="relative flex w-2 h-2">
-            <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-            <span className="relative inline-flex w-2 h-2 rounded-full bg-emerald-400" />
-          </span>
-          Live
-        </span>
-      </div>
-
-      {status === 'loading' && (
-        <p className="text-sm text-slate-400">Loading the latest official updates…</p>
-      )}
-
-      {status === 'error' && (
-        <p className="text-sm text-slate-400">
-          Could not load the latest updates right now. Please check the official
-          website directly.
-        </p>
-      )}
-
-      {status === 'ok' && (
-        <>
-          <ul className="divide-y divide-slate-800">
-            {items.map((item, idx) => (
-              <li key={`${item.link}-${idx}`} className="py-3 first:pt-0 last:pb-0">
-                <a href={item.link} target="_blank" rel="noreferrer" className="group block">
-                  <span className="flex items-start justify-between gap-3">
-                    <span className="text-sm font-medium text-slate-200 leading-snug group-hover:text-[#fae596] transition-colors">
-                      {item.title}
-                    </span>
-                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-500 group-hover:text-[#d4af37] transition-colors" />
-                  </span>
-                  {item.date && (
-                    <span className="block mt-1 text-xs text-slate-400">
-                      {formatFeedDate(item.date)}
-                    </span>
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
-          {updatedAt && (
-            <p className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500">
-              Last updated{' '}
-              {updatedAt.toLocaleTimeString('en-IN', {
-                hour: 'numeric',
-                minute: '2-digit',
-              })}
-            </p>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
-
 export const LiveUpdates: React.FC = () => {
   const [activeSource, setActiveSource] = useState<'ALL' | 'RBI' | 'SEBI'>('ALL');
+
+  const [rbiLiveItems, setRbiLiveItems] = useState<FeedItem[]>([]);
+  const [rbiLoading, setRbiLoading] = useState(true);
+  const [rbiError, setRbiError] = useState(false);
+  const [rbiLastUpdated, setRbiLastUpdated] = useState<string>('');
+
+  const [sebiLiveItems, setSebiLiveItems] = useState<FeedItem[]>([]);
+  const [sebiLoading, setSebiLoading] = useState(true);
+  const [sebiError, setSebiError] = useState(false);
+  const [sebiLastUpdated, setSebiLastUpdated] = useState<string>('');
+
+  useEffect(() => {
+    fetch(API_ENDPOINTS.rbiFeeds)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed');
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.items)) {
+          setRbiLiveItems(data.items.slice(0, 8));
+          if (data.lastUpdated) {
+            setRbiLastUpdated(new Date(data.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          }
+        }
+        setRbiLoading(false);
+      })
+      .catch(() => {
+        setRbiError(true);
+        setRbiLoading(false);
+      });
+
+    fetch(API_ENDPOINTS.sebiFeeds)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed');
+        return res.json();
+      })
+      .then((data) => {
+        if (data && Array.isArray(data.items)) {
+          setSebiLiveItems(data.items.slice(0, 8));
+          if (data.lastUpdated) {
+            setSebiLastUpdated(new Date(data.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          }
+        }
+        setSebiLoading(false);
+      })
+      .catch(() => {
+        setSebiError(true);
+        setSebiLoading(false);
+      });
+  }, []);
 
   const topics: RegulatoryTopic[] = [
     {
@@ -185,7 +79,7 @@ export const LiveUpdates: React.FC = () => {
       title: 'Monetary Policy Framework and Policy Repo Rate Resolutions',
       category: 'Monetary Policy',
       documentType: 'Official Resolution',
-      summary: 'Decisions of the Monetary Policy Committee (MPC) regarding benchmark repo rate settings, liquidity adjustments, and macroeconomic growth projections.',
+      summary: 'Decisions of the Monetary Policy Committee regarding benchmark repo rate settings, liquidity adjustments, and macroeconomic growth projections.',
       url: 'https://rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx',
     },
     {
@@ -209,29 +103,29 @@ export const LiveUpdates: React.FC = () => {
     {
       id: 'rbi-4',
       source: 'RBI',
-      title: 'Master Direction on Financial Literacy and Banking Standards',
-      category: 'Financial Education',
-      documentType: 'Master Circular',
-      summary: 'Standardized framework establishing customer rights, banking transparency, and financial education centers across commercial banks in India.',
-      url: 'https://rbi.org.in/Scripts/NotificationUser.aspx',
+      title: 'Master Direction on Financial Benchmarks and Base Lending Rates',
+      category: 'Banking Framework',
+      documentType: 'Master Direction',
+      summary: 'Statutory rules governing how commercial banks link floating home loans and retail credit to external benchmarks like the RBI Repo Rate.',
+      url: 'https://rbi.org.in/Scripts/BS_ViewMasDirections.aspx',
     },
     {
       id: 'sebi-1',
       source: 'SEBI',
-      title: 'Categorization and Rationalization of Mutual Fund Schemes',
-      category: 'Mutual Fund Mandate',
-      documentType: 'Master Circular',
-      summary: 'The statutory circular establishing standardized scheme categories for Equity, Debt, and Hybrid funds to ensure portfolios remain transparent and true-to-label.',
-      url: 'https://www.sebi.gov.in/legal/circulars.html',
+      title: 'Categorisation and Rationalization of Mutual Fund Schemes',
+      category: 'Fund Categorization',
+      documentType: 'SEBI Master Circular',
+      summary: 'The landmark October 2017 circular creating 5 distinct mutual fund groups (Equity, Debt, Hybrid, Solution Oriented, Other) with rigid asset allocation rules.',
+      url: 'https://www.sebi.gov.in/legal/master-circulars/may-2023/master-circular-for-mutual-funds_71457.html',
     },
     {
       id: 'sebi-2',
       source: 'SEBI',
-      title: 'SCORES 2.0 Centralized Investor Grievance Redressal System',
-      category: 'Investor Redressal',
-      documentType: 'Redressal Portal',
-      summary: 'Two-tier automated review mechanism enabling retail investors to lodge and track complaints against listed companies and market intermediaries with mandatory 21-day resolution timelines.',
-      url: 'https://scores.sebi.gov.in/',
+      title: 'Mandatory Implementation of Direct Plans and Unbundled Expense Ratios',
+      category: 'Fee Transparency',
+      documentType: 'Statutory Circular',
+      summary: 'Rules requiring every mutual fund scheme to offer a Direct Plan with zero distributor commissions and lower Total Expense Ratios (TER).',
+      url: 'https://www.sebi.gov.in/legal/circulars/sep-2012/circular-for-mutual-funds_23467.html',
     },
     {
       id: 'sebi-3',
@@ -259,23 +153,200 @@ export const LiveUpdates: React.FC = () => {
   });
 
   return (
-    <section id="regulatory-topics" className="py-16 md:py-24 border-t border-slate-800/80">
+    <section id="regulatory-topics" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with requested new heading */}
+        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-xs font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
             <FileText className="w-3.5 h-3.5" />
             <span>Primary Sources</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
-            Key regulatory topics, curated from official sources
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
+            Key regulatory topics and live official feeds
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed">
-            Essential reference documents and statutory portals from the Reserve Bank of India (rbi.org.in) and the Securities and Exchange Board of India (sebi.gov.in). Each card links directly to the official government source.
+          <p className="text-slate-300 font-serif text-base leading-relaxed">
+            Real-time regulatory announcements from the Reserve Bank of India (rbi.org.in) and the Securities and Exchange Board of India (sebi.gov.in), alongside curated primary source documentation.
           </p>
+        </div>
 
-          {/* Filter Pills */}
-          <div className="mt-8 inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+        {/* Live Official Feeds Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          {/* Latest from RBI */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-[#0d0e14] border border-white/10 shadow-xl flex flex-col justify-between hover:border-white/20 transition-all">
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-black border border-white/10 text-slate-300">
+                    <Landmark className="w-5 h-5 text-[#d4af37]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-serif font-bold text-white">Latest from RBI</h3>
+                    <p className="text-xs font-sans text-slate-400">Official press releases and notifications</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 font-sans">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-600/60 text-emerald-300 text-[11px] font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Live</span>
+                  </span>
+                  {rbiLastUpdated && (
+                    <span className="text-[11px] text-slate-400">Updated {rbiLastUpdated}</span>
+                  )}
+                </div>
+              </div>
+
+              {rbiLoading ? (
+                <div className="py-12 text-center text-xs font-sans text-slate-400 animate-pulse">
+                  Loading live RBI feed...
+                </div>
+              ) : rbiError || rbiLiveItems.length === 0 ? (
+                <div className="p-6 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3">
+                  <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
+                  <p className="text-xs font-serif text-slate-300">
+                    Live RBI feed could not load directly. Please visit the official Reserve Bank of India website at rbi.org.in.
+                  </p>
+                  <a
+                    href="https://rbi.org.in"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-sans font-bold text-[#fae596] hover:text-[#d4af37]"
+                  >
+                    <span>Visit rbi.org.in</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-3 font-sans">
+                  {rbiLiveItems.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group block p-4 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:-translate-y-0.5"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        {item.label && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/5 text-slate-300 border border-white/10">
+                            {item.label}
+                          </span>
+                        )}
+                        <span className="text-[11px] text-slate-400 font-medium ml-auto">{item.date}</span>
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-[#fae596] transition-colors leading-snug">
+                        {item.title}
+                      </h4>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs font-sans text-slate-400">
+              <span>Source: Reserve Bank of India RSS</span>
+              <a
+                href="https://rbi.org.in"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white transition-colors flex items-center gap-1"
+              >
+                <span>rbi.org.in</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+
+          {/* Latest from SEBI */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-[#0d0e14] border border-white/10 shadow-xl flex flex-col justify-between hover:border-white/20 transition-all">
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-black border border-white/10 text-slate-300">
+                    <ShieldCheck className="w-5 h-5 text-[#d4af37]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-serif font-bold text-white">Latest from SEBI</h3>
+                    <p className="text-xs font-sans text-slate-400">Official orders, circulars, and updates</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 font-sans">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-600/60 text-emerald-300 text-[11px] font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Live</span>
+                  </span>
+                  {sebiLastUpdated && (
+                    <span className="text-[11px] text-slate-400">Updated {sebiLastUpdated}</span>
+                  )}
+                </div>
+              </div>
+
+              {sebiLoading ? (
+                <div className="py-12 text-center text-xs font-sans text-slate-400 animate-pulse">
+                  Loading live SEBI feed...
+                </div>
+              ) : sebiError || sebiLiveItems.length === 0 ? (
+                <div className="p-6 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3">
+                  <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
+                  <p className="text-xs font-serif text-slate-300">
+                    Live SEBI feed could not load directly. Please visit the official Securities and Exchange Board of India website at sebi.gov.in.
+                  </p>
+                  <a
+                    href="https://www.sebi.gov.in"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-sans font-bold text-[#fae596] hover:text-[#d4af37]"
+                  >
+                    <span>Visit sebi.gov.in</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-3 font-sans">
+                  {sebiLiveItems.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group block p-4 rounded-xl bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:-translate-y-0.5"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/5 text-slate-300 border border-white/10">
+                          SEBI Update
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium ml-auto">{item.date}</span>
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-[#fae596] transition-colors leading-snug">
+                        {item.title}
+                      </h4>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs font-sans text-slate-400">
+              <span>Source: SEBI RSS</span>
+              <a
+                href="https://www.sebi.gov.in"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white transition-colors flex items-center gap-1"
+              >
+                <span>sebi.gov.in</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Pills for Static Reference Cards */}
+        <div className="text-center max-w-3xl mx-auto mb-8 font-sans">
+          <h3 className="text-xl font-serif font-bold text-white mb-2">Curated Regulatory Reference Library</h3>
+          <p className="text-xs sm:text-sm font-serif text-slate-400">
+            Essential reference documents and statutory portals from official archives.
+          </p>
+          <div className="mt-4 inline-flex p-1 rounded-xl bg-[#0d0e14] border border-white/10 text-xs">
             <button
               onClick={() => setActiveSource('ALL')}
               className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -311,52 +382,32 @@ export const LiveUpdates: React.FC = () => {
           </div>
         </div>
 
-        {/* Live official feeds from RBI and SEBI */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
-          <LiveFeedList
-            title="Latest from RBI"
-            endpoint={API_ENDPOINTS.feedsRbi}
-            icon={<Landmark className="w-5 h-5 text-[#d4af37]" />}
-          />
-          <LiveFeedList
-            title="Latest from SEBI"
-            endpoint={API_ENDPOINTS.feedsSebi}
-            icon={<ShieldCheck className="w-5 h-5 text-[#d4af37]" />}
-          />
-        </div>
-
         {/* Curated Topic Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {filteredTopics.map((topic) => (
             <div
               key={topic.id}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-[#d4af37]/40 transition-all flex flex-col justify-between shadow-lg"
+              className="p-6 rounded-2xl bg-[#0d0e14] border border-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-all flex flex-col justify-between shadow-lg"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase border ${
-                      topic.source === 'RBI'
-                        ? 'bg-blue-950/60 text-blue-300 border-blue-700/60'
-                        : 'bg-emerald-950/60 text-emerald-300 border-emerald-700/60'
-                    }`}
-                  >
+                <div className="flex items-center justify-between gap-2 mb-3 font-sans">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase border bg-white/5 text-slate-300 border-white/10">
                     {topic.source} Directive
                   </span>
                   <span className="text-xs text-slate-400 font-medium">{topic.category}</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2 leading-snug">
+                <h3 className="text-lg font-serif font-bold text-white mb-2 leading-snug">
                   {topic.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+                <p className="text-xs sm:text-sm font-serif text-slate-300 leading-relaxed mb-6">
                   {topic.summary}
                 </p>
               </div>
 
               {/* Direct Official Link */}
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between font-sans">
                 <span className="text-xs text-slate-400">{topic.documentType}</span>
                 <a
                   href={topic.url}
@@ -372,10 +423,10 @@ export const LiveUpdates: React.FC = () => {
           ))}
         </div>
 
-        {/* Full, untruncated primary source statement */}
-        <div className="max-w-3xl mx-auto mt-10 p-5 rounded-2xl bg-slate-900/70 border border-slate-800 text-xs text-slate-300 text-center leading-relaxed">
+        {/* Full primary source statement */}
+        <div className="max-w-3xl mx-auto mt-10 p-5 rounded-2xl bg-[#0d0e14] border border-white/10 text-xs text-slate-300 text-center leading-relaxed font-serif">
           <p>
-            <strong className="text-white block mb-1">Primary Source Commitment:</strong>
+            <strong className="text-white block mb-1 font-sans">Primary Source Commitment:</strong>
             All regulatory topics listed here originate directly from official government and regulatory documentation published by the Reserve Bank of India and the Securities and Exchange Board of India. We do not host synthetic or AI-generated news. Every card provides direct navigation to primary regulatory records.
           </p>
         </div>

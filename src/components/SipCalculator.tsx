@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calculator, TrendingUp, IndianRupee, PieChart, Sparkles, Check } from 'lucide-react';
+import { Calculator, Sparkles } from 'lucide-react';
 
 export const SipCalculator: React.FC = () => {
   const [monthlyInvestment, setMonthlyInvestment] = useState<number>(10000);
@@ -79,15 +79,15 @@ export const SipCalculator: React.FC = () => {
     };
   }, [monthlyInvestment, expectedReturnRate, timePeriodYears, stepUpPercent]);
 
-  // Format INR nicely with Lakhs and Crores
+  // Format INR nicely with ₹ and Lakhs/Crores
   const formatInr = (val: number): string => {
     if (val >= 10000000) {
-      return `Rs ${(val / 10000000).toFixed(2)} Cr`;
+      return `₹${(val / 10000000).toFixed(2)} Cr`;
     }
     if (val >= 100000) {
-      return `Rs ${(val / 100000).toFixed(2)} Lakh`;
+      return `₹${(val / 100000).toFixed(2)} Lakh`;
     }
-    return `Rs ${val.toLocaleString('en-IN')}`;
+    return `₹${val.toLocaleString('en-IN')}`;
   };
 
   // SVG Donut calculation
@@ -99,17 +99,18 @@ export const SipCalculator: React.FC = () => {
   const gainsStrokeDash = gainsRatio * circumference;
 
   return (
-    <section id="calculator" className="py-16 md:py-24 border-t border-slate-800/80">
+    <section id="calculator" className="py-16 md:py-24 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-xs font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
-            Interactive Tools
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121318] border border-white/10 text-xs font-sans font-semibold text-[#d4af37] uppercase tracking-wider mb-3">
+            <Calculator className="w-3.5 h-3.5" />
+            <span>Interactive Tools</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-4">
             Systematic Investment Plan (SIP) Calculator
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed">
+          <p className="text-slate-300 font-serif text-base leading-relaxed">
             Witness the exponential power of compounding. Adjust your monthly contribution, anticipated annual return, and investing horizon to visualize your financial future.
           </p>
         </div>
@@ -117,15 +118,15 @@ export const SipCalculator: React.FC = () => {
         {/* Calculator Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
           {/* Controls Column (7 cols) */}
-          <div className="lg:col-span-7 p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-6 shadow-xl">
+          <div className="lg:col-span-7 p-6 sm:p-8 rounded-2xl bg-[#0d0e14] border border-white/10 space-y-6 shadow-xl hover:border-white/20 transition-all">
             {/* Monthly Investment */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-200">
+                <label className="text-sm font-sans font-semibold text-slate-200">
                   Monthly Investment Amount
                 </label>
-                <div className="flex items-center px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-white font-mono font-bold text-sm">
-                  <span>Rs {monthlyInvestment.toLocaleString('en-IN')}</span>
+                <div className="flex items-center px-3 py-1.5 rounded-lg bg-black border border-white/10 text-white font-mono font-bold text-sm">
+                  <span>₹{monthlyInvestment.toLocaleString('en-IN')}</span>
                 </div>
               </div>
               <input
@@ -137,7 +138,7 @@ export const SipCalculator: React.FC = () => {
                 onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
               />
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1 font-sans">
                 {[2500, 5000, 10000, 25000, 50000].map((preset) => (
                   <button
                     key={preset}
@@ -145,10 +146,10 @@ export const SipCalculator: React.FC = () => {
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                       monthlyInvestment === preset
                         ? 'bg-[#d4af37] text-slate-950 font-bold'
-                        : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:border-white/20'
                     }`}
                   >
-                    Rs {preset >= 1000 ? `${preset / 1000}k` : preset}
+                    ₹{preset >= 1000 ? `${preset / 1000}k` : preset}
                   </button>
                 ))}
               </div>
@@ -157,10 +158,10 @@ export const SipCalculator: React.FC = () => {
             {/* Expected Annual Return */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-200">
+                <label className="text-sm font-sans font-semibold text-slate-200">
                   Expected Annual Return Rate (p.a.)
                 </label>
-                <div className="flex items-center px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-white font-mono font-bold text-sm">
+                <div className="flex items-center px-3 py-1.5 rounded-lg bg-black border border-white/10 text-white font-mono font-bold text-sm">
                   <span>{expectedReturnRate}%</span>
                 </div>
               </div>
@@ -173,7 +174,7 @@ export const SipCalculator: React.FC = () => {
                 onChange={(e) => setExpectedReturnRate(Number(e.target.value))}
                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
               />
-              <div className="flex items-center justify-between text-[11px] text-slate-500">
+              <div className="flex items-center justify-between text-[11px] font-sans text-slate-400">
                 <span>Conservative Debt (7%)</span>
                 <span>Nifty Index Fund (12%)</span>
                 <span>Active Equity (14%)</span>
@@ -183,10 +184,10 @@ export const SipCalculator: React.FC = () => {
             {/* Time Period Years */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-200">
+                <label className="text-sm font-sans font-semibold text-slate-200">
                   Investment Time Horizon
                 </label>
-                <div className="flex items-center px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-white font-mono font-bold text-sm">
+                <div className="flex items-center px-3 py-1.5 rounded-lg bg-black border border-white/10 text-white font-mono font-bold text-sm">
                   <span>{timePeriodYears} Years</span>
                 </div>
               </div>
@@ -199,7 +200,7 @@ export const SipCalculator: React.FC = () => {
                 onChange={(e) => setTimePeriodYears(Number(e.target.value))}
                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#d4af37]"
               />
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1 font-sans">
                 {[5, 10, 15, 20, 25].map((y) => (
                   <button
                     key={y}
@@ -207,7 +208,7 @@ export const SipCalculator: React.FC = () => {
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                       timePeriodYears === y
                         ? 'bg-[#d4af37] text-slate-950 font-bold'
-                        : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:border-white/20'
                     }`}
                   >
                     {y} Years
@@ -217,11 +218,11 @@ export const SipCalculator: React.FC = () => {
             </div>
 
             {/* Optional Step-Up Feature */}
-            <div className="pt-4 border-t border-slate-800">
+            <div className="pt-4 border-t border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-                  <span className="text-xs font-semibold text-slate-300">
+                  <span className="text-xs font-sans font-semibold text-slate-300">
                     Annual Step-Up SIP (Optional)
                   </span>
                 </div>
@@ -229,7 +230,7 @@ export const SipCalculator: React.FC = () => {
                   {stepUpPercent > 0 ? `+${stepUpPercent}% each year` : 'Flat SIP'}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 font-sans">
                 {[0, 5, 10, 15].map((s) => (
                   <button
                     key={s}
@@ -237,7 +238,7 @@ export const SipCalculator: React.FC = () => {
                     className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       stepUpPercent === s
                         ? 'bg-[#d4af37]/20 border-[#d4af37] text-amber-200 font-bold'
-                        : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-slate-200'
+                        : 'bg-black/60 border-white/10 text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {s === 0 ? 'No Step-Up' : `+${s}% / yr`}
@@ -248,12 +249,12 @@ export const SipCalculator: React.FC = () => {
           </div>
 
           {/* Results & Donut Chart Column (5 cols) */}
-          <div className="lg:col-span-5 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 space-y-6 shadow-xl flex flex-col justify-between">
+          <div className="lg:col-span-5 p-6 sm:p-8 rounded-2xl bg-[#0d0e14] border border-white/10 space-y-6 shadow-xl flex flex-col justify-between hover:border-white/20 transition-all">
             <div>
-              <span className="text-xs font-bold text-[#d4af37] tracking-wider uppercase block mb-1">
+              <span className="text-xs font-sans font-bold text-[#d4af37] tracking-wider uppercase block mb-1">
                 Projected Wealth Summary
               </span>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-6">
+              <div className="text-3xl sm:text-4xl font-serif font-black text-white tracking-tight mb-6">
                 {formatInr(calculation.finalValue)}
               </div>
 
@@ -266,7 +267,7 @@ export const SipCalculator: React.FC = () => {
                     cy="50"
                     r="40"
                     fill="transparent"
-                    stroke="#1e293b"
+                    stroke="#1e2029"
                     strokeWidth="12"
                   />
                   {/* Total Invested arc */}
@@ -275,7 +276,7 @@ export const SipCalculator: React.FC = () => {
                     cy="50"
                     r="40"
                     fill="transparent"
-                    stroke="#3b82f6"
+                    stroke="#475569"
                     strokeWidth="12"
                     strokeDasharray={`${investedStrokeDash} ${circumference}`}
                     strokeDashoffset="0"
@@ -297,30 +298,30 @@ export const SipCalculator: React.FC = () => {
 
                 {/* Inner center text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Wealth Multiple</span>
-                  <span className="text-xl font-extrabold text-amber-200">
+                  <span className="text-[10px] uppercase font-sans font-bold text-slate-400">Wealth Multiple</span>
+                  <span className="text-xl font-serif font-black text-amber-200">
                     {(calculation.finalValue / (calculation.totalInvested || 1)).toFixed(1)}x
                   </span>
-                  <span className="text-[10px] text-slate-500">of Invested Capital</span>
+                  <span className="text-[10px] font-sans text-slate-500">of Invested Capital</span>
                 </div>
               </div>
 
               {/* Breakdown numbers */}
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-white/10">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-3 h-3 rounded-full bg-blue-500" />
-                    <span className="text-xs text-slate-300 font-medium">Total Invested Amount:</span>
+                    <span className="w-3 h-3 rounded-full bg-slate-500" />
+                    <span className="text-xs font-sans text-slate-300 font-medium">Total Invested Amount:</span>
                   </div>
                   <span className="text-sm font-bold text-white font-mono">
                     {formatInr(calculation.totalInvested)}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-white/10">
                   <div className="flex items-center gap-2.5">
                     <span className="w-3 h-3 rounded-full bg-[#d4af37]" />
-                    <span className="text-xs text-slate-300 font-medium">Estimated Wealth Gain:</span>
+                    <span className="text-xs font-sans text-slate-300 font-medium">Estimated Wealth Gain:</span>
                   </div>
                   <span className="text-sm font-bold text-[#fae596] font-mono">
                     {formatInr(calculation.estimatedGains)}
@@ -330,7 +331,7 @@ export const SipCalculator: React.FC = () => {
             </div>
 
             {/* Formula Context Note */}
-            <p className="text-[11px] text-slate-500 leading-relaxed pt-4 border-t border-slate-800">
+            <p className="text-[11px] font-serif text-slate-400 leading-relaxed pt-4 border-t border-white/10">
               *Calculation based on monthly compound growth rate assuming regular uninterrupted SIP debit. Past market performance does not guarantee future results.
             </p>
           </div>
