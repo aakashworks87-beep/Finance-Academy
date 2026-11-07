@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Landmark, ShieldCheck, FileText } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 interface RegulatoryTopic {
   id: string;
@@ -10,6 +11,169 @@ interface RegulatoryTopic {
   summary: string;
   url: string;
 }
+
+interface FeedItem {
+  title: string;
+  date: string;
+  link: string;
+}
+
+// Feed titles can contain HTML entities (for example &#8377; for the rupee
+// sign). Decode them so titles display as real text.
+const decodeEntities = (text: string): string => {
+  const ta = document.createElement('textarea');
+  ta.innerHTML = text;
+  return ta.value;
+};
+
+// The feeds endpoints return items with a title, a date and a link. Accept the
+// common payload shapes and field spellings, and keep only usable items.
+const normalizeFeedItems = (payload: unknown): FeedItem[] => {
+  const root = (payload ?? {}) as Record<string, unknown>;
+  const rawList: unknown[] = Array.isArray(payload)
+    ? payload
+    : Array.isArray(root.items)
+      ? (root.items as unknown[])
+      : Array.isArray(root.feed)
+        ? (root.feed as unknown[])
+        : Array.isArray(root.results)
+          ? (root.results as unknown[])
+          : Array.isArray(root.data)
+            ? (root.data as unknown[])
+            : [];
+
+  const items: FeedItem[] = [];
+  for (const raw of rawList) {
+    if (!raw || typeof raw !== 'object') continue;
+    const r = raw as Record<string, unknown>;
+    const title =
+      typeof r.title === 'string' ? r.title : typeof r.name === 'string' ? r.name : '';
+    const link =
+      typeof r.link === 'string'
+        ? r.link
+        : typeof r.url === 'string'
+          ? r.url
+          : typeof r.href === 'string'
+            ? r.href
+            : '';
+    const date =
+      typeof r.date === 'string'
+        ? r.date
+        : typeof r.pubDate === 'string'
+          ? r.pubDate
+          : typeof r.published === 'string'
+            ? r.published
+            : '';
+    if (!title || !link) continue;
+    items.push({ title: decodeEntities(title), date, link });
+  }
+  return items.slice(0, 8);
+};
+
+const formatFeedDate = (value: string): string => {
+  if (!value) return '';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const LiveFeedList: React.FC<{
+  title: string;
+  endpoint: string;
+  icon: React.ReactNode;
+}> = ({ title, endpoint, icon }) => {
+  const [items, setItems] = useState<FeedItem[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error(`Feed request failed: ${res.status}`);
+        const payload: unknown = await res.json();
+        const parsed = normalizeFeedItems(payload);
+        if (parsed.length === 0) throw new Error('Feed returned no items');
+        if (cancelled) return;
+        setItems(parsed);
+        setUpdatedAt(new Date());
+        setStatus('ok');
+      } catch {
+        if (!cancelled) setStatus('error');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [endpoint]);
+
+  return (
+    <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 shadow-lg text-left flex flex-col">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <h3 className="flex items-center gap-2 text-base font-bold text-white">
+          {icon}
+          <span>{title}</span>
+        </h3>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-emerald-950/60 text-emerald-300 border border-emerald-700/60">
+          <span className="relative flex w-2 h-2">
+            <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+            <span className="relative inline-flex w-2 h-2 rounded-full bg-emerald-400" />
+          </span>
+          Live
+        </span>
+      </div>
+
+      {status === 'loading' && (
+        <p className="text-sm text-slate-400">Loading the latest official updates…</p>
+      )}
+
+      {status === 'error' && (
+        <p className="text-sm text-slate-400">
+          Could not load the latest updates right now. Please check the official
+          website directly.
+        </p>
+      )}
+
+      {status === 'ok' && (
+        <>
+          <ul className="divide-y divide-slate-800">
+            {items.map((item, idx) => (
+              <li key={`${item.link}-${idx}`} className="py-3 first:pt-0 last:pb-0">
+                <a href={item.link} target="_blank" rel="noreferrer" className="group block">
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="text-sm font-medium text-slate-200 leading-snug group-hover:text-[#fae596] transition-colors">
+                      {item.title}
+                    </span>
+                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-500 group-hover:text-[#d4af37] transition-colors" />
+                  </span>
+                  {item.date && (
+                    <span className="block mt-1 text-xs text-slate-400">
+                      {formatFeedDate(item.date)}
+                    </span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+          {updatedAt && (
+            <p className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500">
+              Last updated{' '}
+              {updatedAt.toLocaleTimeString('en-IN', {
+                hour: 'numeric',
+                minute: '2-digit',
+              })}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
 export const LiveUpdates: React.FC = () => {
   const [activeSource, setActiveSource] = useState<'ALL' | 'RBI' | 'SEBI'>('ALL');
@@ -145,6 +309,20 @@ export const LiveUpdates: React.FC = () => {
               <span>SEBI Directives</span>
             </button>
           </div>
+        </div>
+
+        {/* Live official feeds from RBI and SEBI */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+          <LiveFeedList
+            title="Latest from RBI"
+            endpoint={API_ENDPOINTS.feedsRbi}
+            icon={<Landmark className="w-5 h-5 text-[#d4af37]" />}
+          />
+          <LiveFeedList
+            title="Latest from SEBI"
+            endpoint={API_ENDPOINTS.feedsSebi}
+            icon={<ShieldCheck className="w-5 h-5 text-[#d4af37]" />}
+          />
         </div>
 
         {/* Curated Topic Cards */}

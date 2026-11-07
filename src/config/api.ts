@@ -9,4 +9,6 @@ export const API_ENDPOINTS = {
   health: `${BACKEND_BASE_URL}/api/health`,
   chat: `${BACKEND_BASE_URL}/api/chat`,
   regulatoryTopics: `${BACKEND_BASE_URL}/api/regulatory-topics`,
+  feedsRbi: `${BACKEND_BASE_URL}/api/feeds/rbi`,
+  feedsSebi: `${BACKEND_BASE_URL}/api/feeds/sebi`,
 };
