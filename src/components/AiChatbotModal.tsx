@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LOGO_IMG_SRC } from '../assets/logo';
-import { API_ENDPOINTS } from '../config/api';
+import { tutorChat, tutorConfigured, tutorSpeakUrl } from '../lib/tutor';
 import { ChatMessage } from '../types';
 import { FormattedMessage } from './FormattedMessage';
 import { TutorAvatar } from './TutorAvatar';
@@ -127,32 +127,10 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({
       return;
     }
 
-    // Fetch from backend /api/tts
+    // Generate speech with the browser-side tutor (Gemini TTS)
     setAudioLoadingId(messageId);
     try {
-      const response = await fetch(API_ENDPOINTS.tts, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: spokenText }),
-      });
-
-      if (!response.ok) {
-        throw new Error('TTS failed');
-      }
-
-      let audioUrl = '';
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const data = await response.json();
-        if (data.audio) {
-          audioUrl = `data:${data.mimeType || 'audio/wav'};base64,${data.audio}`;
-        } else {
-          throw new Error('No audio in response');
-        }
-      } else {
-        const audioBlob = await response.blob();
-        audioUrl = URL.createObjectURL(audioBlob);
-      }
+      const audioUrl = await tutorSpeakUrl(spokenText);
 
       audioCacheRef.current[messageId] = audioUrl;
 
@@ -193,19 +171,10 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({
     });
   };
 
-  // Check backend health for genuine online/offline status
+  // The tutor runs in the browser now, so "online" simply means a Gemini
+  // API key was provided when the site was built.
   const checkHealth = async () => {
-    try {
-      const res = await fetch(API_ENDPOINTS.health);
-      if (res.ok) {
-        const data = await res.json();
-        setIsOnline(Boolean(data.online));
-      } else {
-        setIsOnline(false);
-      }
-    } catch {
-      setIsOnline(false);
-    }
+    setIsOnline(tutorConfigured);
   };
 
   useEffect(() => {
@@ -239,32 +208,18 @@ export const AiChatbotModal: React.FC<AiChatbotModalProps> = ({
     setLoading(true);
 
     try {
-      const response = await fetch(API_ENDPOINTS.chat, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newMessages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-          mode: chatMode,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Backend failed');
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      const replyText = await tutorChat(
+        newMessages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        chatMode,
+      );
 
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        content: data.text,
+        content: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
