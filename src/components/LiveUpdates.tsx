@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Landmark, ShieldCheck, FileText, AlertCircle } from 'lucide-react';
-import { API_ENDPOINTS } from '../config/api';
+import { fetchRbiItems, fetchSebiItems } from '../lib/feeds';
 
 interface FeedItem {
   title: string;
@@ -33,43 +33,49 @@ export const LiveUpdates: React.FC = () => {
   const [sebiLastUpdated, setSebiLastUpdated] = useState<string>('');
 
   useEffect(() => {
-    fetch(API_ENDPOINTS.rbiFeeds)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed');
-        return res.json();
-      })
-      .then((data) => {
-        if (data && Array.isArray(data.items)) {
-          setRbiLiveItems(data.items.slice(0, 8));
-          if (data.lastUpdated) {
-            setRbiLastUpdated(new Date(data.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          }
+    let cancelled = false;
+
+    fetchRbiItems()
+      .then(({ items, ok }) => {
+        if (cancelled) return;
+        if (ok) {
+          setRbiLiveItems(items);
+          setRbiLastUpdated(
+            new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          );
+        } else {
+          setRbiError(true);
         }
         setRbiLoading(false);
       })
       .catch(() => {
+        if (cancelled) return;
         setRbiError(true);
         setRbiLoading(false);
       });
 
-    fetch(API_ENDPOINTS.sebiFeeds)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed');
-        return res.json();
-      })
-      .then((data) => {
-        if (data && Array.isArray(data.items)) {
-          setSebiLiveItems(data.items.slice(0, 8));
-          if (data.lastUpdated) {
-            setSebiLastUpdated(new Date(data.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          }
+    fetchSebiItems()
+      .then(({ items, ok }) => {
+        if (cancelled) return;
+        if (ok) {
+          setSebiLiveItems(items);
+          setSebiLastUpdated(
+            new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          );
+        } else {
+          setSebiError(true);
         }
         setSebiLoading(false);
       })
       .catch(() => {
+        if (cancelled) return;
         setSebiError(true);
         setSebiLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const topics: RegulatoryTopic[] = [
@@ -203,7 +209,9 @@ export const LiveUpdates: React.FC = () => {
                 <div className="p-6 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3">
                   <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
                   <p className="text-xs font-serif text-slate-300">
-                    Live RBI feed could not load directly. Please visit the official Reserve Bank of India website at rbi.org.in.
+                    {rbiError
+                      ? 'Live RBI feed could not load directly. Please visit the official Reserve Bank of India website at rbi.org.in.'
+                      : 'The official RBI feed has no new items right now. Please visit the official Reserve Bank of India website at rbi.org.in.'}
                   </p>
                   <a
                     href="https://rbi.org.in"
@@ -288,7 +296,9 @@ export const LiveUpdates: React.FC = () => {
                 <div className="p-6 rounded-2xl bg-black/60 border border-white/10 text-center space-y-3">
                   <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
                   <p className="text-xs font-serif text-slate-300">
-                    Live SEBI feed could not load directly. Please visit the official Securities and Exchange Board of India website at sebi.gov.in.
+                    {sebiError
+                      ? 'Live SEBI feed could not load directly. Please visit the official Securities and Exchange Board of India website at sebi.gov.in.'
+                      : 'The official SEBI feed has no new items right now. Please visit the official Securities and Exchange Board of India website at sebi.gov.in.'}
                   </p>
                   <a
                     href="https://www.sebi.gov.in"
