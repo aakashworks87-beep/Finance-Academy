@@ -1,20 +1,15 @@
 /**
- * Backend API configuration
- * Prepared for cross-origin hosting (e.g. GitHub Pages) with Cloud Run backend.
+ * Site data configuration.
+ *
+ * This site is fully static (GitHub Pages) and no longer depends on the old
+ * AI Studio dev backend. That backend URL now sits behind a cookie check
+ * page and cannot answer API calls, which is what broke the live feeds and
+ * the AI tutor. Instead:
+ * - Live RBI and SEBI headlines are read from the official RSS feeds in the
+ *   browser (see src/lib/feeds.ts).
+ * - The AI tutor talks to Gemini directly from the browser (see
+ *   src/lib/tutor.ts).
  */
-// When running in local dev or deployed on the same server, use relative path so local tests and dev server hit local endpoints.
-// On GitHub Pages, use the live Cloud Run backend URL.
-const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-export const BACKEND_BASE_URL = isLocal
-  ? ''
-  : 'https://ais-dev-go3g32rkwrmxlyvwgidedn-813067729840.asia-southeast1.run.app';
-
-export const API_ENDPOINTS = {
-  health: `${BACKEND_BASE_URL}/api/health`,
-  chat: `${BACKEND_BASE_URL}/api/chat`,
-  tts: `${BACKEND_BASE_URL}/api/tts`,
-  regulatoryTopics: `${BACKEND_BASE_URL}/api/regulatory-topics`,
-  rbiFeeds: `${BACKEND_BASE_URL}/api/feeds/rbi`,
-  sebiFeeds: `${BACKEND_BASE_URL}/api/feeds/sebi`,
-};
+export const RBI_PRESS_RELEASES_RSS = 'https://www.rbi.org.in/pressreleases_rss.xml';
+export const RBI_NOTIFICATIONS_RSS = 'https://www.rbi.org.in/notifications_rss.xml';
+export const SEBI_RSS = 'https://www.sebi.gov.in/sebirss.xml';
